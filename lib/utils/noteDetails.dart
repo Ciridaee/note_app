@@ -24,14 +24,14 @@ class _NoteDetailState extends State<NoteDetail> {
   var formKey = GlobalKey<FormState>();
   late List<Category> allCategories;
   late DatabaseHelper databaseHelper;
+
   int? categoryID = 1;
-  int? chosenPriority;
+  int? chosenPriority = 0;
   String? noteHeader, noteContent;
   var _priority = ['Dusuk', 'Orta', 'Yuksek'];
   @override
   void initState() {
     super.initState();
-
     allCategories = <Category>[];
     databaseHelper = DatabaseHelper();
     databaseHelper.getCategories().then((mapListWithCategories) {

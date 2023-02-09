@@ -2,6 +2,7 @@
 class Note {
   late int? noteID;
   late int? categoryID;
+  late String categoryName;
   late String? noteHeader;
   late String? noteContent;
   late String? noteDate;
@@ -33,6 +34,7 @@ class Note {
   }
 
   Note.fromMap(Map<String, dynamic> map) {
+    this.categoryName = map['categoryName'];
     this.noteID = map['noteID'];
     this.categoryID = map['categoryID'];
     this.noteHeader = map['noteHeader'];
@@ -40,7 +42,6 @@ class Note {
     this.noteDate = map['noteDate'];
     this.notePriority = map['notePriority'];
   }
-  
 
   @override
   String toString() {
