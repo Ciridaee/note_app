@@ -3,8 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:note_app/models/category.dart';
+import 'package:note_app/models/notes.dart';
 import 'package:note_app/utils/database_helper.dart';
 
+/*GlobalKey : Tüm uygulama boyunca benzersiz olan bir anahtar. GlobalKey öğeleri benzersiz şekilde anahtar atar.
+FormState: Bir FormState nesnesi, ilişkili Form'un altındaki form alanlarını kaydetmek/save, sıfırlamak/reset ve doğrulamak/validate için kullanılabilir.
+Herhangi bir zamanda form değerlerini kaydetmek, almak ve ayrıca doğrulama amacıyla GlobalKey bir anahtar oluşturmamız gerekir. */
 class NoteDetail extends StatefulWidget {
   String header;
   NoteDetail({
@@ -22,6 +26,7 @@ class _NoteDetailState extends State<NoteDetail> {
   late DatabaseHelper databaseHelper;
   int? categoryID = 1;
   int? chosenPriority;
+  String? noteHeader, noteContent;
   var _priority = ['Dusuk', 'Orta', 'Yuksek'];
   @override
   void initState() {
@@ -86,6 +91,14 @@ class _NoteDetailState extends State<NoteDetail> {
               padding: EdgeInsets.symmetric(vertical: 11),
               width: MediaQuery.of(context).size.width * 0.9,
               child: TextFormField(
+                validator: (text) {
+                  if (text!.isEmpty) {
+                    return 'Baslik adi bos olamaz';
+                  }
+                },
+                onSaved: (text) {
+                  noteHeader = text;
+                },
                 decoration: InputDecoration(
                   hintText: 'Notun basligini giriniz',
                   labelText: 'baslik',
@@ -98,6 +111,9 @@ class _NoteDetailState extends State<NoteDetail> {
               padding: EdgeInsets.symmetric(vertical: 11),
               width: MediaQuery.of(context).size.width * 0.9,
               child: TextFormField(
+                onSaved: (text) {
+                  noteContent = text;
+                },
                 maxLines: 3,
                 decoration: InputDecoration(
                   hintText: 'Notun icerigini giriniz',
@@ -150,14 +166,30 @@ class _NoteDetailState extends State<NoteDetail> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
                   child: Text('vazgec'),
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all(Colors.blueGrey),
                   ),
                 ),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    if (formKey.currentState!.validate()) {
+                      formKey.currentState!.save();
+                      var now = DateTime.now();
+                      databaseHelper
+                          .addNote(Note(
+                              categoryID: categoryID,
+                              noteHeader: noteHeader,
+                              noteContent: noteContent,
+                              noteDate: now.toString(),
+                              notePriority: chosenPriority))
+                          .then((savedNoteID) => Navigator.pop(context));
+                      print(now);
+                    }
+                  },
                   child: Text('kaydet'),
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all(Colors.blueGrey),

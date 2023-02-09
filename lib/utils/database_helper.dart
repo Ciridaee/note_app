@@ -107,10 +107,87 @@ class DatabaseHelper {
     return result;
   }
 
-  Future<int> deleteeNote(Note noteID) async {
+  Future<int> deleteNote(Note noteID) async {
     var db = await _getDatabase();
     var result =
         await db!.delete('note', where: 'noteID = ?', whereArgs: [noteID]);
     return result;
+  }
+
+  String dateFormat(DateTime tm) {
+    DateTime today = DateTime.now();
+    Duration oneDay = Duration(days: 1);
+    Duration twoDay = Duration(days: 2);
+    Duration threeDay = Duration(days: 3);
+    Duration oneWeek = Duration(days: 7);
+    String month;
+    switch (tm.month) {
+      case 1:
+        month = 'ocak';
+        break;
+      case 2:
+        month = 'subat';
+        break;
+      case 3:
+        month = 'mart';
+        break;
+      case 4:
+        month = 'nisan';
+        break;
+      case 5:
+        month = 'mayis';
+        break;
+      case 6:
+        month = 'haziran';
+        break;
+      case 7:
+        month = 'temmuz';
+        break;
+      case 8:
+        month = 'agustos';
+        break;
+      case 9:
+        month = 'eylul';
+        break;
+      case 10:
+        month = 'ekim';
+        break;
+      case 11:
+        month = 'kasim';
+        break;
+      case 12:
+        month = 'aralik';
+        break;
+    }
+    Duration difference = today.difference(tm);
+    if (difference.compareTo(oneDay) < 1) {
+      return 'bugun';
+    } else if (difference.compareTo(twoDay) < 1) {
+      return 'dun';
+    } else if (difference.compareTo(threeDay) < 1) {
+      return '3 gun once';
+    } else if (difference.compareTo(oneWeek) < 1) {
+      switch (tm.weekday) {
+        case 1:
+          return 'pazartesi';
+        case 2:
+          return 'sali';
+        case 3:
+          return 'carsamba';
+        case 4:
+          return 'persembe';
+        case 5:
+          return 'cuma';
+        case 6:
+          return 'cumartesi';
+        case 7:
+          return 'pazar';
+      }
+    } else if (tm.year == today.year) {
+      return '${tm.day} ${tm.month}';
+    } else {
+      '${tm.day} ${tm.month} ${tm.year}';
+    }
+    return '';
   }
 }
