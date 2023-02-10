@@ -187,7 +187,6 @@ class _NoteDetailState extends State<NoteDetail> {
                               noteDate: now.toString(),
                               notePriority: chosenPriority))
                           .then((savedNoteID) => Navigator.pop(context));
-                      print(now);
                     }
                   },
                   child: Text('kaydet'),

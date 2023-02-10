@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
@@ -6,7 +8,9 @@ import 'package:note_app/models/notes.dart';
 import 'package:note_app/utils/database_helper.dart';
 import 'package:note_app/utils/noteDetails.dart';
 
-void main() => runApp(new MyApp());
+void main() {
+  runApp(new MyApp());
+}
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -159,15 +163,13 @@ class _NoteListState extends State<NoteList> {
         MaterialPageRoute(
             builder: (context) => NoteDetail(
                   header: 'new note',
-                )));
+                ))).then((value) => setState(() {}));
   }
 }
 
 class Notes extends StatefulWidget {
-  const Notes({super.key});
-
   @override
-  State<Notes> createState() => _NotesState();
+  _NotesState createState() => _NotesState();
 }
 
 class _NotesState extends State<Notes> {
@@ -185,13 +187,16 @@ class _NotesState extends State<Notes> {
     return FutureBuilder(
       future: databaseHelper.getNoteList(),
       //databasehelperdan note listesini getirdikten sonra builderi calistirir
-      builder: (BuildContext context, AsyncSnapshot<List<Note>> snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          allNotes = snapshot.data!;
+      builder: (BuildContext context, AsyncSnapshot<List<Note>> snapShot) {
+        if (snapShot.connectionState == ConnectionState.done) {
+          print('object');
+          allNotes = snapShot.data!;
+          print('object2');
           return ListView.builder(
             itemCount: allNotes.length,
             itemBuilder: (BuildContext context, int index) {
-              return ListTile(
+              print('object3');
+              return ExpansionTile(
                 title: Text(
                   allNotes[index].noteHeader.toString(),
                 ),
@@ -200,7 +205,8 @@ class _NotesState extends State<Notes> {
             },
           );
         } else {
-          return CircularProgressIndicator();
+          print(';');
+          return Center(child: CircularProgressIndicator());
         }
       },
     );
