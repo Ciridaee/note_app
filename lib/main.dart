@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -7,6 +8,7 @@ import 'package:note_app/models/category.dart';
 import 'package:note_app/models/notes.dart';
 import 'package:note_app/utils/database_helper.dart';
 import 'package:note_app/utils/noteDetails.dart';
+import 'package:note_app/utils/noteDetailsUpdate.dart';
 
 void main() {
   runApp(new MyApp());
@@ -134,9 +136,12 @@ class _NoteListState extends State<NoteList> {
                             .addCategory(Category(newCategoryName))
                             .then((categoryID) {
                           if (categoryID > 0) {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
                                 content: Text('kategori eklendi'),
-                                duration: Duration(seconds: 2)));
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
                           }
                           Navigator.pop(context);
                         });
@@ -189,26 +194,108 @@ class _NotesState extends State<Notes> {
       //databasehelperdan note listesini getirdikten sonra builderi calistirir
       builder: (BuildContext context, AsyncSnapshot<List<Note>> snapShot) {
         if (snapShot.connectionState == ConnectionState.done) {
-          print('object');
           allNotes = snapShot.data!;
-          print('object2');
+          sleep(Duration(milliseconds: 200));
           return ListView.builder(
             itemCount: allNotes.length,
             itemBuilder: (BuildContext context, int index) {
-              print('object3');
               return ExpansionTile(
                 title: Text(
                   allNotes[index].noteHeader.toString(),
                 ),
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Kategori: ',
+                          style: TextStyle(color: Colors.black),
+                        ),
+                        Text(
+                          allNotes[index].categoryName,
+                          style: TextStyle(color: Colors.blueGrey),
+                        )
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Olusturulma Tarihi: ',
+                          style: TextStyle(color: Colors.black),
+                        ),
+                        Text(
+                          databaseHelper.dateFormat(
+                            DateTime.parse(
+                              allNotes[index].noteDate.toString(),
+                            ),
+                          ),
+                          style: TextStyle(color: Colors.blueGrey),
+                        )
+                      ],
+                    ),
+                  ),
+                  Text(allNotes[index].noteContent.toString()),
+                  ButtonBar(
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          _deleteNote(allNotes[index].noteID);
+                        },
+                        child: Text(
+                          'Sil',
+                          style: TextStyle(color: Colors.black),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          _goDetailPage(context, allNotes[index]);
+                        },
+                        child: Text(
+                          'Guncelle',
+                          style: TextStyle(color: Colors.black),
+                        ),
+                      ),
+                    ],
+                  )
+                ],
                 subtitle: Text(allNotes[index].categoryName),
               );
             },
           );
         } else {
-          print(';');
-          return Center(child: CircularProgressIndicator());
+          return Center(child: Text('yukleniyor..'));
         }
       },
     );
+  }
+
+  _goDetailPage(BuildContext context, Note note) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => NoteDetail2(
+                  header: 'notu duzenle',
+                  updatedNote: note,
+                ))).then((value) => setState(() {}));
+  }
+
+  _deleteNote(int? noteID) {
+    databaseHelper.deleteNote(noteID!.toInt()).then((deletedID) {
+      if (deletedID != 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('not silindi'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    });
+    setState(() {});
   }
 }

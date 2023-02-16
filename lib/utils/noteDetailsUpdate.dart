@@ -9,16 +9,17 @@ import 'package:note_app/utils/database_helper.dart';
 /*GlobalKey : Tüm uygulama boyunca benzersiz olan bir anahtar. GlobalKey öğeleri benzersiz şekilde anahtar atar.
 FormState: Bir FormState nesnesi, ilişkili Form'un altındaki form alanlarını kaydetmek/save, sıfırlamak/reset ve doğrulamak/validate için kullanılabilir.
 Herhangi bir zamanda form değerlerini kaydetmek, almak ve ayrıca doğrulama amacıyla GlobalKey bir anahtar oluşturmamız gerekir. */
-class NoteDetail extends StatefulWidget {
+class NoteDetail2 extends StatefulWidget {
   String header;
-  NoteDetail({Key? key, required this.header})
+  Note updatedNote;
+  NoteDetail2({Key? key, required this.header, required this.updatedNote})
       : super(key: key);
 
   @override
-  State<NoteDetail> createState() => _NoteDetailState();
+  State<NoteDetail2> createState() => _NoteDetailState2();
 }
 
-class _NoteDetailState extends State<NoteDetail> {
+class _NoteDetailState2 extends State<NoteDetail2> {
   var formKey = GlobalKey<FormState>();
   late List<Category> allCategories;
   late DatabaseHelper databaseHelper;
@@ -89,6 +90,9 @@ class _NoteDetailState extends State<NoteDetail> {
               padding: EdgeInsets.symmetric(vertical: 11),
               width: MediaQuery.of(context).size.width * 0.9,
               child: TextFormField(
+                initialValue: widget.updatedNote != null
+                    ? widget.updatedNote.noteHeader
+                    : '',
                 validator: (text) {
                   if (text!.isEmpty) {
                     return 'Baslik adi bos olamaz';
@@ -109,6 +113,9 @@ class _NoteDetailState extends State<NoteDetail> {
               padding: EdgeInsets.symmetric(vertical: 11),
               width: MediaQuery.of(context).size.width * 0.9,
               child: TextFormField(
+                initialValue: widget.updatedNote != null
+                    ? widget.updatedNote.noteContent
+                    : '',
                 onSaved: (text) {
                   noteContent = text;
                 },
